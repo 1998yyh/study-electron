@@ -21,4 +21,22 @@ app.whenReady().then(() => {
   } else {
     mainWindow.loadFile("dist/index.html");
   }
+  mainWindow.on("closed", () => {
+    console.log("closed");
+  });
+  mainWindow.on("focus", () => {
+    console.log("focus");
+  });
+  mainWindow.on("show", () => {
+    console.log("show");
+  });
+  mainWindow.on("hide", () => {
+    console.log("hide");
+  });
+  mainWindow.on("minimize", () => {
+    console.log("minimize");
+  });
+});
+app.on("will-finish-launching", () => {
+  console.log("will-finish-launching");
 });
