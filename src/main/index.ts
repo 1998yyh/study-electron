@@ -2,12 +2,14 @@ import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import getApps from '../utils/getApp'
+import app2png from '../utils/app2png'
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
-    height: 670,
+    height: 300,
     show: false,
     // 不带包装外壳 窗口边框 工具栏等
     frame: false,
@@ -59,14 +61,30 @@ app.whenReady().then(() => {
   })
 
   // 窗口移动通信
-  ipcMain.on('window-move', (event, data) => {
-    const { x, y } = screen.getCursorScreenPoint()
-    const { mouseX, mouseY, width, height } = data
-    // 获取当前需要移动的窗口
-    const originWindow = BrowserWindow.fromId(event.sender.id)
-    if (!originWindow) return
-    // 重新设置窗口位置
-    originWindow.setBounds({ x: x - mouseX, y: y - mouseY, width, height })
+  // ipcMain.on('window-move', (event, data) => {
+  //   const { x, y } = screen.getCursorScreenPoint()
+  //   const { mouseX, mouseY, width, height } = data
+  //   // 获取当前需要移动的窗口
+  //   const originWindow = BrowserWindow.fromId(event.sender.id)
+  //   if (!originWindow) return
+  //   // 重新设置窗口位置
+  //   originWindow.setBounds({ x: x - mouseX, y: y - mouseY, width, height })
+  // })
+
+  ipcMain.handle('getApp', async (event, data) => {
+    console.log('event', event)
+
+    const { promise, resolve, reject } = Promise.withResolvers()
+
+    // getApps(resolve, reject, data.text)
+    getApps(resolve, reject, false)
+
+    const res = await promise
+    res.forEach((element) => {
+      console.log(element.path)
+      element.icon = app2png(element.path, '/Users/hao.yang/Desktop/test/png')
+    })
+    return res
   })
 
   createWindow()
